@@ -1,4 +1,4 @@
-const {Pool} = require('pg');
+//const {Pool} = require('pg');
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 9888
@@ -13,10 +13,10 @@ express()
   .get('/login', (req, res) => res.render('pages/login'))
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-const pool = new Pool({
+/*const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: true
-});
+});*/
 
 function todo() {
 }
