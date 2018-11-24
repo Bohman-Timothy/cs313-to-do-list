@@ -1,4 +1,4 @@
-//const {Pool} = require('pg');
+const {Pool} = require('pg');
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 9888
