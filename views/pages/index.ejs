@@ -5,10 +5,24 @@
     <title>To-Do List</title>
 </head>
 <script>
+var topContent = "empty"
+
+function loginForm () {
+    document.getElementById("top_content").innerHTML = <% include ../partials/login.ejs %>
+}
 </script>
 <body>
 <h1>To-Do List</h1>
-<a href="/login">Sign In</a>
-<!-- <input type="button" value="Sign In" onclick='/login'> -->
+<!-- <a href="/login">Sign In</a> -->
+
+<input type="button" value="Sign In" onclick="location.href='login'">
+<!-- changeTopContent('login') -->
+<br/>
+<div id="top_content">
+    <% function changeTopContent(topContent) { %>
+        <% console.log("Including partial...") %>
+		<%- include ../partials/login %>
+	<% } %>
+</div>
 </body>
 </html>
