@@ -7,6 +7,7 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .get('/toDoDate', toDoDate)
   .get('/toDoDateSpan', toDoDateSpan)
+  .get('/toDoId', toDoId)
   /*.get('/login', login)*/
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
@@ -82,6 +83,29 @@ function toDoDateSpan (request, response) {
         })
     } else {
         errorMessage = 'No date given'
+        console.log(errorMessage)
+    }
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
+}
+
+function toDoId (request, response) {
+    var errorMessage
+    if (typeof(request.query.id) !== "undefined") {
+        console.log("ID: " + request.query.id)
+        pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + request.query.id, (err, res) => {
+            if (res.rows.length !== 0) {
+                console.log(JSON.stringify(res.rows))
+                return response.json(res.rows)
+            }
+            else {
+                errorMessage = 'No match found for ID given'
+                console.log(errorMessage)
+            }
+        })
+    } else {
+        errorMessage = 'No ID given'
         console.log(errorMessage)
     }
     if (errorMessage) {
