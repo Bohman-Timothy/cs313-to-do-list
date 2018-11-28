@@ -136,4 +136,10 @@ Documentation → PostgreSQL 10 - 9.9. Date/Time Functions and Operators - Chapt
 
 http://www.informit.com/articles/article.aspx?p=24123&seqNum=4
 informit - Passing Data with Form and URL Variables
+
+https://www.sitepoint.com/testing-for-empty-values/
+SitePoint - Test for Empty Values in Javascript
+
+https://www.tutorialspoint.com/nodejs/nodejs_response_object.htm
+TutorialsPoint - Node.js - Response Object
  */
