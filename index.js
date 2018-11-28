@@ -60,7 +60,9 @@ function toDoDate (request, response) {
         errorMessage = 'No date given'
         console.log(errorMessage)
     }
-    return response.send('<p>See log for error message</p>')
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
 }
 
 function toDoDateSpan (request, response) {
@@ -73,13 +75,17 @@ function toDoDateSpan (request, response) {
                 return response.json(res.rows)
             }
             else {
-                console.log('No match found for date span given')
+                errorMessage = 'No match found for date span given'
+                console.log(errorMessage)
             }
         })
     } else {
-        console.log('No date given')
+        errorMessage = 'No date given'
+        console.log(errorMessage)
     }
-    return response.send('<p>See log for error message</p>')
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
 }
 
 function login() {
