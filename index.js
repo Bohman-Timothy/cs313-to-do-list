@@ -26,19 +26,24 @@ function toDoDate (request, response) {
     if (typeof(request.query.date_to_start) !== "undefined") {
         console.log("Date to Start: " + request.query.date_to_start)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_start= date \'' + request.query.date_to_start + '\'', (err, res) => {
-            console.log(JSON.stringify(res.rows))
-            return response.json(res.rows)
+            if (res.rows.length !== 0) {
+                console.log(JSON.stringify(res.rows))
+                return response.json(res.rows)
+            }
+            else {
+                console.log('No match found for date_to_start')
+            }
         })
     }
     else if (typeof(request.query.date_to_be_done) !== "undefined") {
         console.log("Date to Be Done: " + request.query.date_to_be_done)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_be_done = date \'' + request.query.date_to_be_done + '\'', (err, res) => {
-            if (res !== "undefined") {
+            if (res.rows.length !== 0) {
                 console.log(JSON.stringify(res.rows))
                 return response.json(res.rows)
             }
             else {
-                console.log('No match found')
+                console.log('No match found for date_to_be_done')
             }
         })
     }
@@ -52,8 +57,13 @@ function toDoDateSpan (request, response) {
         console.log("Date to Start: " + request.query.date_to_start)
         console.log("Date to Be Done: " + request.query.date_to_be_done)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE (date_to_start >= date \'' + request.query.date_to_start + '\' AND date_to_start <= date \'' + request.query.date_to_be_done + '\') OR (date_to_be_done >= date \'' + request.query.date_to_start + '\' AND date_to_be_done <= date \'' + request.query.date_to_be_done + '\')', (err, res) => {
-            console.log(JSON.stringify(res.rows))
-            return response.json(res.rows)
+            if (res.rows.length !== 0) {
+                console.log(JSON.stringify(res.rows))
+                return response.json(res.rows)
+            }
+            else {
+                console.log('No match found for date span given')
+            }
         })
     } else {
         console.log('No date given')
