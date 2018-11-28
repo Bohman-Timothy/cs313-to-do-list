@@ -19,7 +19,7 @@ express()
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    https: true
+    ssl: true
 });
 
 function toDoDate (request, response) {
