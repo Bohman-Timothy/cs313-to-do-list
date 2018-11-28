@@ -66,6 +66,7 @@ function toDoDate (request, response) {
 }
 
 function toDoDateSpan (request, response) {
+    var errorMessage
     if ((typeof(request.query.date_to_start) !== "undefined") && (typeof(request.query.date_to_be_done) !== "undefined")) {
         console.log("Date to Start: " + request.query.date_to_start)
         console.log("Date to Be Done: " + request.query.date_to_be_done)
