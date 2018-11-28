@@ -29,10 +29,8 @@ function toDoDate (request, response) {
             console.log(JSON.stringify(res.rows))
             return response.json(res.rows)
         })
-    } else {
-        console.log('No date given')
     }
-    if (typeof(request.query.date_to_be_done) !== "undefined") {
+    else if (typeof(request.query.date_to_be_done) !== "undefined") {
         console.log("Date to Be Done: " + request.query.date_to_be_done)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_be_done = date \'' + request.query.date_to_be_done + '\'', (err, res) => {
             if (res !== "undefined") {
@@ -43,7 +41,8 @@ function toDoDate (request, response) {
                 console.log('No match found')
             }
         })
-    } else {
+    }
+    else {
         console.log('No date given')
     }
 }
