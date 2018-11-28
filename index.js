@@ -26,12 +26,17 @@ function toDoDate (request, response) {
     if (typeof(request.query.date_to_start) !== "undefined") {
         console.log("Date to Start: " + request.query.date_to_start)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_start= date \'' + request.query.date_to_start + '\'', (err, res) => {
-            if (res.rows.length !== 0) {
-                console.log(JSON.stringify(res.rows))
-                return response.json(res.rows)
+            if (res !== "undefined") {
+                if (res.rows.length !== 0) {
+                    console.log(JSON.stringify(res.rows))
+                    return response.json(res.rows)
+                }
+                else {
+                    console.log('No match found for date_to_start')
+                }
             }
             else {
-                console.log('No match found for date_to_start')
+                console.log('Error: res is undefined')
             }
         })
     }
