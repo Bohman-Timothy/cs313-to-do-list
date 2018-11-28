@@ -23,6 +23,7 @@ const pool = new Pool({
 });
 
 function toDoDate (request, response) {
+    var errorMessage
     if (typeof(request.query.date_to_start) !== "undefined") {
         console.log("Date to Start: " + request.query.date_to_start)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_start= date \'' + request.query.date_to_start + '\'', (err, res) => {
@@ -32,11 +33,13 @@ function toDoDate (request, response) {
                     return response.json(res.rows)
                 }
                 else {
-                    console.log('No match found for date_to_start')
+                    errorMessage = 'No match found for date_to_start'
+                    console.log(errorMessage)
                 }
             }
             else {
-                console.log('Error: res is undefined')
+                errorMessage = 'Error: res is undefined'
+                console.log(errorMessage)
             }
         })
     }
@@ -48,13 +51,16 @@ function toDoDate (request, response) {
                 return response.json(res.rows)
             }
             else {
-                console.log('No match found for date_to_be_done')
+                errorMessage = 'No match found for date_to_be_done'
+                console.log(errorMessage)
             }
         })
     }
     else {
-        console.log('No date given')
+        errorMessage = 'No date given'
+        console.log(errorMessage)
     }
+    return response.send('<p>See log for error message</p>')
 }
 
 function toDoDateSpan (request, response) {
@@ -73,6 +79,7 @@ function toDoDateSpan (request, response) {
     } else {
         console.log('No date given')
     }
+    return response.send('<p>See log for error message</p>')
 }
 
 function login() {
