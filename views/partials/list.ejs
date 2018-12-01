@@ -1,0 +1,45 @@
+<h2>Enter Date Range</h2>
+<p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<form id="selectDateRange">
+<label for="fromDate">From Date: </label>
+<input type="text" name="fromDate" id="fromDate">
+<!--
+<input type="number" name="fromYear" id="fromYear" required>
+<input type="number" name="fromMonth" id="fromMonth" required>
+-->
+<br/>
+<label for="fromDate">From Date: </label>
+<input type="text" name="fromDate" id="fromDate">
+<br/>
+<input type="submit" name="submit" value="Display To-Do Items">
+</form>
+
+<form id="selectId" method="post">
+<p>Or enter the ID of the to-do item.</p>
+<label for="toDoId">ID: </label>
+<input type="number" name="toDoId" id="toDoId">
+<br/>
+<input type="submit" name="submit" id="buttonItemId" value="Display To-Do Item">
+<!-- onclick="retrieveToDoItemId(toDoId.value)" -->
+</form>
+
+<h2>To-Do Items</h2>
+<div id="to_do_list_results">
+</div>
+
+<script>
+function retrieveToDoItemId (selectedId) {
+    console.log(selectedId)
+}
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$("#selectId").submit(function(e) {
+    e.preventDefault()
+	var data = { id: toDoId }
+	console.log(data)
+	$.get('/toDoId', data, function (res) {
+		console.log(res)
+	}
+})
+</script>

@@ -3,8 +3,24 @@ const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 9888
 
+const bodyParser = require('body-parser')
+const htmlParser = bodyParser.text({ type: 'text/html' })
+
+var jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+/*let dom = new (require('jsdom').JSDOM)(htmlString);
+let $ = require('jquery')(dom.window);*/
+
+var $ = jQuery = require('jquery')(window);
+
 express()
   .use(express.static(path.join(__dirname, 'public')))
+  //.use(bodyParser.text({ type: 'text/html' }))
+  .use(bodyParser.urlencoded({ extended: true }))
   .get('/toDoDate', toDoDate)
   .get('/toDoDateSpan', toDoDateSpan)
   .get('/toDoId', toDoId)
@@ -16,6 +32,8 @@ express()
       //res.send(req.body.topContent)
       res.render('pages/login')
   })
+  .get('/list', (req, res) => res.render('partials/list'))
+  .post('/list', toDoList)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 const pool = new Pool({
@@ -121,7 +139,77 @@ function loginForm() {
 
 }
 
+
+/*$("#selectId").submit(function(e) {
+    e.preventDefault()*/
+    /*const target = "/toDoId?id=" + $("#toDoId").val() //get to-do item ID from form
+    console.log(target)*/
+    /*$.get(target, function (response) {
+        console.log(JSON.stringify(response))
+    }).fail(function () {
+        //output error message
+    })
+})*/
+
+/*$("#buttonItemId").click(function() {
+$("p").hide()
+})*/
+
+function retrieveToDoItemId (selectedId) {
+    console.log(selectedId)
+    pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
+        if (res.rows.length !== 0) {
+            console.log(JSON.stringify(res.rows))
+            return response.json(res.rows)
+        }
+        else {
+            errorMessage = 'No match found for ID given'
+            console.log(errorMessage)
+        }
+    })
+    /*const target = "/toDoId?id=" + $("#toDoId").val() //get to-do item ID from form
+    console.log(target)*/
+}
+
+function toDoList (request, response, next) {
+    //res.render('partials/list')
+    const selectedId = request.body.toDoId
+    const toDoIdJquery = $("#toDoId").val()
+    console.log("To-Do ID: " + request.body.toDoId)
+    console.log("To-Do ID (jQuery: " + toDoIdJquery)
+    var data = { id: selectedId }
+    console.log(data)
+    //retrieveToDoItemId(toDoId)
+    pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
+        if (res.rows.length !== 0) {
+            console.log(JSON.stringify(res.rows))
+            return response.json(res.rows)
+        }
+        else {
+            errorMessage = 'No match found for ID given'
+            console.log(errorMessage)
+        }
+    })
+/*function toDoList () {
+    $("#selectId").submit(function(e) {
+        e.preventDefault()
+        var data
+        $.post('/list', data, function(resp) {
+            console.log(resp)
+        })
+    })*/
+    /*const target = "/toDoId?id=" + req.body.toDoId //get to-do item ID from form
+    console.log(target)
+    res.redirect(target)*/
+}
+
+function displayToDoItems () {
+}
+
+
 /*
+References
+
 https://www.freecodecamp.org/forum/t/nodejs-trying-to-get-button-to-navigate-to-other-page-in-folder-structure/160941
 Freecodecamp - Nodejs trying to get button to navigate to other page in folder structure
 
@@ -142,4 +230,20 @@ SitePoint - Test for Empty Values in Javascript
 
 https://www.tutorialspoint.com/nodejs/nodejs_response_object.htm
 TutorialsPoint - Node.js - Response Object
+
+https://stackoverflow.com/questions/1801160/can-i-use-jquery-with-node-js
+Stack Overflow - Can I use jQuery with Node.js?
+
+https://stackoverflow.com/questions/36206919/how-do-i-access-ejs-data-in-a-form-while-using-express
+Stack Overflow - How do i access ejs data in a form while using express
+
+https://stackoverflow.com/questions/4295782/how-do-you-extract-post-data-in-node-js
+Stack Overflow - How do you extract POST data in Node.js?
+
+https://stackoverflow.com/questions/19035373/how-do-i-redirect-in-expressjs-while-passing-some-context
+Stack Overflow - How do I redirect in expressjs while passing some context?
+
+https://codeburst.io/explaining-value-vs-reference-in-javascript-647a975e12a0
+Explaining Value vs. Reference in Javascript
+[Syntax for a putting the value of a variable in a JSON object]
  */
