@@ -183,11 +183,13 @@ function toDoList (request, response, next) {
     pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
         if (res.rows.length !== 0) {
             console.log(JSON.stringify(res.rows))
-            return response.json(res.rows)
+            //return response.json(res.rows)
+            //request.body.to_do_list_results.innerHTML += JSON.stringify(res.rows)
         }
         else {
             errorMessage = 'No match found for ID given'
             console.log(errorMessage)
+            console.log(err)
         }
     })
 /*function toDoList () {
@@ -246,4 +248,7 @@ Stack Overflow - How do I redirect in expressjs while passing some context?
 https://codeburst.io/explaining-value-vs-reference-in-javascript-647a975e12a0
 Explaining Value vs. Reference in Javascript
 [Syntax for a putting the value of a variable in a JSON object]
+
+https://stackoverflow.com/questions/10318294/js-dom-equivalent-for-jquery-append
+Stack Overflow - JS DOM equivalent for JQuery append
  */
