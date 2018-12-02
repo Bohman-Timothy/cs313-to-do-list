@@ -37,7 +37,7 @@ express()
   .post('/list', toDoList)
   .get('/toDoItem', (req, res) => res.render('pages/to_do_item'))
   .get('/addItem', (req, res) => res.render('pages/add_item'))
-  .get('/editItem', (req, res) => res.render('pages/edit_item'))
+  .get('/editItem', editItem)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 const pool = new Pool({
@@ -139,10 +139,69 @@ function addToDoItem (request, response) {
     var errorMessage
     if (typeof(request.query.thing_to_do) !== "undefined") {
         console.log("Thing to do: " + request.query.thing_to_do)
-        /*
-        INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done)
-        VALUES (1, 'Complete Week 12 Prove assignment', 'Finish client-side interaction', '2018-12-06', '2018-12-08');
-        */
+        const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')'
+        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5)'
+        const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
+        console.log('Insert query:' + insertQuery)
+        pool.query(qText, qValues, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+                errorMessage = 'Add failed'
+                console.log(errorMessage)
+            }
+            else {
+                console.log(res.rows[0])
+                //return res
+            }
+        })
+    } else {
+        errorMessage = 'Insufficient data provided'
+        console.log(errorMessage)
+    }
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
+}
+
+//Get data for a single to-do item and prepare that data to be retrieved within the edit item page
+function editItem () {
+    var errorMessage
+    var thing_to_do, date_to_start, date_to_be_done, notes
+    if (typeof(request.query.id) !== "undefined") {
+        console.log("ID: " + request.query.id)
+        pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + request.query.id, (err, res) => {
+            if (res.rows.length !== 0) {
+                console.log(JSON.stringify(res.rows))
+                thing_to_do = res.rows[0].thing_to_do
+                date_to_start = res.rows[0].date_to_start
+                date_to_be_done = res.rows[0].date_to_be_done
+                notes = res.rows[0].notes
+            }
+            else {
+                errorMessage = 'No match found for ID given'
+                console.log(errorMessage)
+            }
+        })
+    } else {
+        errorMessage = 'No ID given'
+        console.log(errorMessage)
+    }
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
+    res.render('pages/edit_item', {
+        thing_to_do: thing_to_do,
+        date_to_start: date_to_start,
+        date_to_be_done: date_to_be_done,
+        notes: notes
+    });
+}
+
+//Not yet adapted to edit functionality (instead of add)
+function editToDoItem (request, response) {
+    var errorMessage
+    if (typeof(request.query.thing_to_do) !== "undefined") {
+        console.log("Thing to do: " + request.query.thing_to_do)
         const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')'
         const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5)'
         const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
