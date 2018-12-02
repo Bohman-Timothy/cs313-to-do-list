@@ -29,8 +29,8 @@
         xmlHttp.onreadystatechange = function() {
             console.log("List function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                const ids = JSON.parse(xmlHttp.responseText)
-				console.log(xmlHttp.responseText)
+                //const ids = JSON.parse(xmlHttp.responseText)
+				//console.log(xmlHttp.responseText)
 				//document.getElementById("toDoListResults").innerHTML = "<ul>"
                 /*for (var i = 0; i < ids.length; ++i) {
 					document.getElementById("toDoListResults").innerHTML += '<li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
