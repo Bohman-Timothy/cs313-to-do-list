@@ -164,7 +164,7 @@ function addToDoItem (request, response) {
 }
 
 //Get data for a single to-do item and prepare that data to be retrieved within the edit item page
-function editItem () {
+function editItem (request, response) {
     var errorMessage
     var thing_to_do, date_to_start, date_to_be_done, notes
     if (typeof(request.query.id) !== "undefined") {
