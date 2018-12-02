@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add a To-Do Item to the List</title>
+</head>
+<body>
+<h1>Add a To-Do Item to the List</h1>
+<% include ../partials/nav.ejs %>
+<h2>Enter Task Details</h2>
+<p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<label for="taskName">Task Name: </label>
+<input type="text" name="taskName" id="taskName">
+<br/>
+<label for="fromDate">Date to Start: </label>
+<input type="text" name="fromDate" id="fromDate">
+<br/>
+<label for="toDate">Date to Be Done: </label>
+<input type="text" name="toDate" id="toDate">
+<br/>
+<label for="notes">Task Notes: </label>
+<input type="text" name="notes" id="notes">
+<br/>
+<input type="button" name="addToListButton" id="addToListButton" value="Add To-Do Item" onclick="addToDoItem(taskName.value, fromDate.value, toDate.value, notes.value)">
+</body>
+<script>
+    function addToDoItem (taskName, fromDate, toDate, notes) {
+        const xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = function() {
+            console.log("List function reached")
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                const ids = JSON.parse(xmlHttp.responseText)
+				console.log(xmlHttp.responseText)
+				//document.getElementById("toDoListResults").innerHTML = "<ul>"
+                /*for (var i = 0; i < ids.length; ++i) {
+					document.getElementById("toDoListResults").innerHTML += '<li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
+                }*/
+				//document.getElementById("toDoListResults").innerHTML += "</ul>"
+            }
+        }
+
+        const query = '/addToDoItem?thing_to_do=' + taskName + '&notes=' + notes + '&date_to_start=' + fromDate + '&date_to_be_done=' + toDate
+
+        xmlHttp.open("GET", query, true)
+        xmlHttp.send(null)
+    }
+</script>
+</html>
