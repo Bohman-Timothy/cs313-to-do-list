@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>To-Do Item Details</title>
+</head>
+<body>
+<h2>Enter the ID of the to-do item.</h2>
+<label for="toDoId">ID: </label>
+<input type="number" name="toDoId" id="toDoId">
+<br/>
+<input type="button" name="submit" id="buttonItemId" value="Display To-Do Item" onclick="GetToDoItem(toDoId.value)">
+
+<h2>Enter Date Range</h2>
+<p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<label for="fromDate">From Date: </label>
+<input type="text" name="fromDate" id="fromDate">
+<br/>
+<label for="toDate">To Date: </label>
+<input type="text" name="toDate" id="toDate">
+<br/>
+<input type="button" name="submitDateRange" id="submitDateRange" value="Display To-Do List" onclick="getToDoList()">
+
+<h2>To-Do Items</h2>
+<div id="toDoListResults">
+</div>
+<script>
+    function GetToDoItemDetails(id) {
+        var xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = function() {
+            console.log("Function reached")
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                console.log("readyState and status reached")
+                console.log(xmlHttp.responseText)
+                //var jsonData = JSON.parse(xmlHttp.responseText)
+                //console.log(jsonData)
+                document.getElementById("toDoListResults").innerHTML = xmlHttp.responseText // jsonData
+            }
+        }
+
+        var query = '/toDoId?id=' + id
+
+        xmlHttp.open("GET", query, true)
+        xmlHttp.send(null)
+    }
+
+    function GetToDoItem(id) {
+        const xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = function() {
+            console.log("List function reached")
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                const ids = JSON.parse(xmlHttp.responseText)
+				console.log(xmlHttp.responseText)
+                for (var i = 0; i < ids.length; ++i) {
+                    //GetToDoItem(ids[i])
+					document.getElementById("toDoListResults").innerHTML += xmlHttp.responseText // jsonData
+                }
+            }
+        }
+
+        const query = '/toDoId?id=' + id
+
+        xmlHttp.open("GET", query, true)
+        xmlHttp.send(null)
+    }
+
+    function getToDoList () {
+        const xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = function() {
+            console.log("List function reached")
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                const ids = JSON.parse(xmlHttp.responseText)
+				console.log(xmlHttp.responseText)
+				document.getElementById("toDoListResults").innerHTML = ""
+                for (var i = 0; i < ids.length; ++i) {
+                    //GetToDoItem(ids[i])
+					document.getElementById("toDoListResults").innerHTML += xmlHttp.responseText // jsonData
+                }
+            }
+        }
+
+        const query = '/toDoDateSpan?date_to_start=' + '2018-11-20' + '&date_to_be_done=' + '2018-12-20'
+
+        xmlHttp.open("GET", query, true)
+        xmlHttp.send(null)
+    }
+</script>
+</body>
+</html>

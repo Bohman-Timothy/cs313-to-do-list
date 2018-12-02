@@ -34,6 +34,7 @@ express()
   })
   .get('/list', (req, res) => res.render('partials/list'))
   .post('/list', toDoList)
+  .get('/toDoItem', (req, res) => res.render('pages/to_do_item'))
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 const pool = new Pool({
@@ -89,7 +90,7 @@ function toDoDateSpan (request, response) {
     if ((typeof(request.query.date_to_start) !== "undefined") && (typeof(request.query.date_to_be_done) !== "undefined")) {
         console.log("Date to Start: " + request.query.date_to_start)
         console.log("Date to Be Done: " + request.query.date_to_be_done)
-        pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE (date_to_start >= date \'' + request.query.date_to_start + '\' AND date_to_start <= date \'' + request.query.date_to_be_done + '\') OR (date_to_be_done >= date \'' + request.query.date_to_start + '\' AND date_to_be_done <= date \'' + request.query.date_to_be_done + '\')', (err, res) => {
+        pool.query('SELECT id, thing_to_do, notes, to_char(date_to_start, \'YYYY/MM/DD\' :: text) AS date_to_start, to_char(date_to_be_done, \'YYYY/MM/DD\' :: text) AS date_to_be_done FROM to_do_item WHERE (date_to_start >= date \'' + request.query.date_to_start + '\' AND date_to_start <= date \'' + request.query.date_to_be_done + '\') OR (date_to_be_done >= date \'' + request.query.date_to_start + '\' AND date_to_be_done <= date \'' + request.query.date_to_be_done + '\')  ORDER BY date_to_start ASC', (err, res) => {
             if (res.rows.length !== 0) {
                 console.log(JSON.stringify(res.rows))
                 return response.json(res.rows)
@@ -183,6 +184,15 @@ function toDoList (request, response, next) {
     pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
         if (res.rows.length !== 0) {
             console.log(JSON.stringify(res.rows))
+            /*for (var i = 0; i < res.rows.length; ++i) {
+                const
+            }
+            res.render('pages/toDoItem', {
+                weight: weight,
+                weightUnit: weightUnit,
+                mailType: mailType,
+                postage: postage
+            });*/
             //return response.json(res.rows)
             //request.body.to_do_list_results.innerHTML += JSON.stringify(res.rows)
         }
@@ -251,4 +261,7 @@ Explaining Value vs. Reference in Javascript
 
 https://stackoverflow.com/questions/10318294/js-dom-equivalent-for-jquery-append
 Stack Overflow - JS DOM equivalent for JQuery append
+
+https://stackoverflow.com/questions/17378199/uncaught-referenceerror-function-is-not-defined-with-onclick
+Uncaught ReferenceError: function is not defined with onclick
  */
