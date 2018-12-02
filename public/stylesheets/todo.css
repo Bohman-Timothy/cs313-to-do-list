@@ -1,0 +1,12 @@
+body {
+	background-color: RGB(255, 238, 230);
+	color: rgb(92, 0, 92);
+}
+
+input:focus, textarea:focus {
+	border: 2px solid #5c005c;
+}
+
+input[type=text], input[type=number], input[type=password], textarea {
+	background-color: #ffffd4;
+}

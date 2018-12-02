@@ -171,11 +171,24 @@ function editItem (request, response) {
         console.log("ID: " + request.query.id)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + request.query.id, (err, res) => {
             if (res.rows.length !== 0) {
-                console.log(JSON.stringify(res.rows))
-                thing_to_do = res.rows[0].thing_to_do
-                date_to_start = res.rows[0].date_to_start
-                date_to_be_done = res.rows[0].date_to_be_done
-                notes = res.rows[0].notes
+                selectedItem = JSON.stringify(res.rows)
+                console.log(selectedItem)
+                thing_to_do = res.rows[0]["thing_to_do"]
+                date_to_start = res.rows[0]["date_to_start"].toISOString().
+                    replace(/T.+/, '')
+                date_to_be_done = res.rows[0]["date_to_be_done"].toISOString().
+                    replace(/T.+/, '')
+                notes = res.rows[0]["notes"]
+                console.log(thing_to_do)
+                console.log(date_to_start)
+                console.log(date_to_be_done)
+                console.log(notes)
+                response.render('pages/edit_item', {
+                    thing_to_do: thing_to_do,
+                    date_to_start: date_to_start,
+                    date_to_be_done: date_to_be_done,
+                    notes: notes
+                });
             }
             else {
                 errorMessage = 'No match found for ID given'
@@ -189,12 +202,6 @@ function editItem (request, response) {
     if (errorMessage) {
         return response.send('<p>See log for error message</p>')
     }
-    res.render('pages/edit_item', {
-        thing_to_do: thing_to_do,
-        date_to_start: date_to_start,
-        date_to_be_done: date_to_be_done,
-        notes: notes
-    });
 }
 
 //Not yet adapted to edit functionality (instead of add)
@@ -361,4 +368,13 @@ Uncaught ReferenceError: function is not defined with onclick
 
 https://node-postgres.com/features/queries
 Node-Postgres - Queries - Parameterized query
+
+https://www.w3schools.com/tags/tag_textarea.asp
+W3Schools - HTML <textarea> Tag
+
+https://stackoverflow.com/questions/10645994/how-to-format-a-utc-date-as-a-yyyy-mm-dd-hhmmss-string-using-nodejs
+Stack Overflow - How to format a UTC date as a `YYYY-MM-DD hh:mm:ss` string using NodeJS?
+
+https://www.w3schools.com/css/css_colors.asp
+W3Schools - CSS Colors - Color Values
  */

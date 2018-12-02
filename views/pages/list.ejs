@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <% include ../partials/head.ejs %>
   <title>To-Do Item List</title>
 </head>
 <body>
@@ -11,14 +11,14 @@
 <p>All items that have their beginning-to-end-date-span overlap at least partially with the selected date range will be shown.</p>
 <p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
 <label for="fromDate">From Date: </label>
-<input type="text" name="fromDate" id="fromDate">
+<input type="text" name="fromDate" id="fromDate" size="10">
 <!--
 <input type="number" name="fromYear" id="fromYear" required>
 <input type="number" name="fromMonth" id="fromMonth" required>
 -->
 <br/>
 <label for="toDate">To Date: </label>
-<input type="text" name="toDate" id="toDate">
+<input type="text" name="toDate" id="toDate" size="10">
 <br/>
 <input type="button" name="submitDateRange" id="submitDateRange" value="Display To-Do List" onclick="getToDoList(fromDate.value, toDate.value)">
 

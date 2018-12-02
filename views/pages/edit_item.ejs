@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <% include ../partials/head.ejs %>
   <title>Edit a To-Do Item</title>
 </head>
 <body>
@@ -10,16 +10,16 @@
 <h2>Enter Task Details</h2>
 <p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
 <label for="taskName">Task Name: </label>
-<input type="text" name="taskName" id="taskName" value="">
+<input type="text" name="taskName" id="taskName" size="40" value="<%= thing_to_do %>">
 <br/>
 <label for="fromDate">Date to Start: </label>
-<input type="text" name="fromDate" id="fromDate" value="">
+<input type="text" name="fromDate" id="fromDate" size="10" value="<%= date_to_start %>">
 <br/>
 <label for="toDate">Date to Be Done: </label>
-<input type="text" name="toDate" id="toDate" value="">
+<input type="text" name="toDate" id="toDate" size="10" value="<%= date_to_be_done %>">
 <br/>
-<label for="notes">Task Notes: </label>
-<input type="text" name="notes" id="notes" value="">
+<label for="notes">Task Notes:</label><br/>
+<textarea name="notes" id="notes" rows="6" cols="50"><%= notes %></textarea>
 <br/>
 <input type="button" name="addToListButton" id="addToListButton" value="Add To-Do Item" onclick="editToDoItem(taskName.value, fromDate.value, toDate.value, notes.value)">
 </body>
