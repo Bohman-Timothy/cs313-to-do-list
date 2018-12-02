@@ -143,18 +143,19 @@ function addToDoItem (request, response) {
         INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done)
         VALUES (1, 'Complete Week 12 Prove assignment', 'Finish client-side interaction', '2018-12-06', '2018-12-08');
         */
-        //const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')'
-        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ("$1", "$2", "$3", "$4", "$5")'
+        const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')'
+        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5)'
         const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
         console.log('Insert query:' + insertQuery)
-        pool.query(insertQuery, (err, res) => {
-            if (res !== 'undefined') {
-                console.log(res)
-                //return res
-            }
-            else {
+        pool.query(qText, qValues, (err, res) => {
+            if (err) {
+                console.log(err.stack)
                 errorMessage = 'Add failed'
                 console.log(errorMessage)
+            }
+            else {
+                console.log(res.rows[0])
+                //return res
             }
         })
     } else {
