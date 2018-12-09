@@ -38,6 +38,8 @@ express()
   .get('/toDoItem', (req, res) => res.render('pages/to_do_item'))
   .get('/addItem', (req, res) => res.render('pages/add_item'))
   .get('/editItem', editItem)
+  .get('/editToDoItem', editToDoItem)
+  .get('/deleteItem', deleteItem)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 const pool = new Pool({
@@ -139,8 +141,8 @@ function addToDoItem (request, response) {
     var errorMessage
     if (typeof(request.query.thing_to_do) !== "undefined") {
         console.log("Thing to do: " + request.query.thing_to_do)
-        const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')'
-        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5)'
+        const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')  RETURNING id'
+        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5) RETURNING id, thing_to_do, notes, date_to_start, date_to_be_done'
         const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
         console.log('Insert query:' + insertQuery)
         pool.query(qText, qValues, (err, res) => {
@@ -151,7 +153,7 @@ function addToDoItem (request, response) {
             }
             else {
                 console.log(res.rows[0])
-                //return res
+                return response.json(res.rows[0])
             }
         })
     } else {
@@ -173,6 +175,7 @@ function editItem (request, response) {
             if (res.rows.length !== 0) {
                 selectedItem = JSON.stringify(res.rows)
                 console.log(selectedItem)
+                id = res.rows[0]["id"]
                 thing_to_do = res.rows[0]["thing_to_do"]
                 date_to_start = res.rows[0]["date_to_start"].toISOString().
                     replace(/T.+/, '')
@@ -184,6 +187,7 @@ function editItem (request, response) {
                 console.log(date_to_be_done)
                 console.log(notes)
                 response.render('pages/edit_item', {
+                    id: id,
                     thing_to_do: thing_to_do,
                     date_to_start: date_to_start,
                     date_to_be_done: date_to_be_done,
@@ -207,21 +211,21 @@ function editItem (request, response) {
 //Not yet adapted to edit functionality (instead of add)
 function editToDoItem (request, response) {
     var errorMessage
-    if (typeof(request.query.thing_to_do) !== "undefined") {
-        console.log("Thing to do: " + request.query.thing_to_do)
-        const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')'
-        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5)'
-        const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
-        console.log('Insert query:' + insertQuery)
+    if (typeof(request.query.id) !== "undefined") {
+        console.log("ID: " + request.query.id + " Thing to do: " + request.query.thing_to_do)
+        const updateQuery = 'UPDATE to_do_item (thing_to_do, notes, date_to_start, date_to_be_done, date_modified) VALUES (\'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\'' + ' \'now()\') WHERE id = ' + request.query.id + ';'
+        const qText = 'UPDATE to_do_item SET thing_to_do = $1, notes = $2, date_to_start = $3, date_to_be_done = $4, date_modified = $5 WHERE id = $6 RETURNING thing_to_do'
+        const qValues = [request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done, 'now()', request.query.id]
+        console.log('Update query:' + updateQuery)
         pool.query(qText, qValues, (err, res) => {
             if (err) {
                 console.log(err.stack)
-                errorMessage = 'Add failed'
+                errorMessage = 'Update failed'
                 console.log(errorMessage)
             }
             else {
                 console.log(res.rows[0])
-                //return res
+                return response.json(res.rows[0])
             }
         })
     } else {
@@ -377,4 +381,10 @@ Stack Overflow - How to format a UTC date as a `YYYY-MM-DD hh:mm:ss` string usin
 
 https://www.w3schools.com/css/css_colors.asp
 W3Schools - CSS Colors - Color Values
+
+https://stackoverflow.com/questions/37243698/how-can-i-find-the-last-insert-id-with-node-js-and-postgresql
+Stack Overflow - How can I find the last insert ID with Node.js and Postgresql?
+
+https://stackoverflow.com/questions/503093/how-do-i-redirect-to-another-webpage
+Stack Overflow - How do I redirect to another webpage? [JavaScript]
  */

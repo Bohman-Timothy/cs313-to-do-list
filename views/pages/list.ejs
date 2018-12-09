@@ -40,7 +40,7 @@
     console.log(selectedId)
 }*/
 
-    function getToDoItem(id) {
+    function getToDoItem (id) {
         var xmlHttp = new XMLHttpRequest()
         xmlHttp.onreadystatechange = function() {
             console.log("Function reached")
@@ -66,11 +66,11 @@
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 const ids = JSON.parse(xmlHttp.responseText)
 				console.log(xmlHttp.responseText)
-				document.getElementById("toDoListResults").innerHTML = "<ul>"
+				document.getElementById("toDoListResults").innerHTML = "<ul id='toDoList'>"
                 for (var i = 0; i < ids.length; ++i) {
                     //GetToDoItem(ids[i])
 					//document.getElementById("toDoListResults").innerHTML += xmlHttp.responseText // jsonData
-					document.getElementById("toDoListResults").innerHTML += '<li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
+					document.getElementById("toDoListResults").innerHTML += '<li><input type="button" value="editItem" onclick="linkToEditItem(' + ids[i]["id"] + ')" id="' + ids[i]["id"] + '"> <strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
                 }
 				document.getElementById("toDoListResults").innerHTML += "</ul>"
             }
@@ -81,6 +81,10 @@
         xmlHttp.open("GET", query, true)
         xmlHttp.send(null)
     }
+	
+	function linkToEditItem (toDoId) {
+		location.href="editItem?id=" + toDoId
+	}
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>

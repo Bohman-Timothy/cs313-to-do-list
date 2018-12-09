@@ -9,6 +9,7 @@
 <% include ../partials/nav.ejs %>
 <h2>Enter Task Details</h2>
 <p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<input type="text" name="taskId" id="taskId" size="40" value="<%= id %>" class="hidden">
 <label for="taskName">Task Name: </label>
 <input type="text" name="taskName" id="taskName" size="40" value="<%= thing_to_do %>">
 <br/>
@@ -21,25 +22,26 @@
 <label for="notes">Task Notes:</label><br/>
 <textarea name="notes" id="notes" rows="6" cols="50"><%= notes %></textarea>
 <br/>
-<input type="button" name="addToListButton" id="addToListButton" value="Add To-Do Item" onclick="editToDoItem(taskName.value, fromDate.value, toDate.value, notes.value)">
+<input type="button" name="addToListButton" id="addToListButton" value="Edit To-Do Item" onclick="editToDoItem(taskId.value, taskName.value, fromDate.value, toDate.value, notes.value)">
+<div id="editToDoItemResult">
+</div>
 </body>
 <script>
-    function editToDoItem (taskName, fromDate, toDate, notes) {
+    function editToDoItem (taskId, taskName, fromDate, toDate, notes) {
+	    console.log("editToDoItem function reached")
         const xmlHttp = new XMLHttpRequest()
         xmlHttp.onreadystatechange = function() {
-            console.log("List function reached")
+            console.log("editToDoItem AJAX function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 //const ids = JSON.parse(xmlHttp.responseText)
 				//console.log(xmlHttp.responseText)
-				//document.getElementById("toDoListResults").innerHTML = "<ul>"
-                /*for (var i = 0; i < ids.length; ++i) {
-					document.getElementById("toDoListResults").innerHTML += '<li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
-                }*/
-				//document.getElementById("toDoListResults").innerHTML += "</ul>"
+				document.getElementById("editToDoItemResult").innerHTML = "<p class='successMessage'>Successfully edited to-do item &quot;" + taskName + "&quot;.</p>"
+				document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
+				//document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul>'
             }
         }
 
-        const query = '/addToDoItem?thing_to_do=' + taskName + '&notes=' + notes + '&date_to_start=' + fromDate + '&date_to_be_done=' + toDate
+        const query = '/editToDoItem?id=' + taskId + '&thing_to_do=' + taskName + '&notes=' + notes + '&date_to_start=' + fromDate + '&date_to_be_done=' + toDate
 
         xmlHttp.open("GET", query, true)
         xmlHttp.send(null)

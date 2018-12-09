@@ -22,20 +22,20 @@
 <textarea name="notes" id="notes" rows="6" cols="50"></textarea>
 <br/>
 <input type="button" name="addToListButton" id="addToListButton" value="Add To-Do Item" onclick="addToDoItem(taskName.value, fromDate.value, toDate.value, notes.value)">
+<div id="addToListResult">
+</div>
 </body>
 <script>
     function addToDoItem (taskName, fromDate, toDate, notes) {
         const xmlHttp = new XMLHttpRequest()
         xmlHttp.onreadystatechange = function() {
-            console.log("List function reached")
+            console.log("addToDoItem function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 //const ids = JSON.parse(xmlHttp.responseText)
-				//console.log(xmlHttp.responseText)
-				//document.getElementById("toDoListResults").innerHTML = "<ul>"
-                /*for (var i = 0; i < ids.length; ++i) {
-					document.getElementById("toDoListResults").innerHTML += '<li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
-                }*/
-				//document.getElementById("toDoListResults").innerHTML += "</ul>"
+				console.log(xmlHttp.responseText)
+				document.getElementById("addToListResult").innerHTML = "<p class='successMessage'>Successfully added to-do item &quot;" + taskName + "&quot;.</p>"
+				document.getElementById("addToListResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
+				//document.getElementById("addToListResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids["date_to_start"] + ' <strong>End Date:</strong> ' + ids["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids["notes"] + '</li></ul>'
             }
         }
 

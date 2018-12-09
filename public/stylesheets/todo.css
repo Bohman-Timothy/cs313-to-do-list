@@ -10,3 +10,14 @@ input:focus, textarea:focus {
 input[type=text], input[type=number], input[type=password], textarea {
 	background-color: #ffffd4;
 }
+
+.successMessage {
+	font-weight: strong;
+}
+
+.hidden {
+	display: none;
+}
+ul#toDoList li {
+	list-style-type: none;
+}
