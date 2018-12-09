@@ -8,7 +8,7 @@
 <h1>Edit a To-Do Item</h1>
 <% include ../partials/nav.ejs %>
 <h2>Enter Task Details</h2>
-<p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<p>Dates should be given in the format <span class="dateFormat">YYYY-MM-DD</span> (four-digit year, two-digit month, and two-digit day of the month) to be interpreted correctly.</p>
 <input type="text" name="taskId" id="taskId" size="40" value="<%= id %>" class="hidden">
 <label for="taskName">Task Name: </label>
 <input type="text" name="taskName" id="taskName" size="40" value="<%= thing_to_do %>">
@@ -22,7 +22,7 @@
 <label for="notes">Task Notes:</label><br/>
 <textarea name="notes" id="notes" rows="6" cols="50"><%= notes %></textarea>
 <br/>
-<input type="button" name="addToListButton" id="addToListButton" value="Edit To-Do Item" onclick="editToDoItem(taskId.value, taskName.value, fromDate.value, toDate.value, notes.value)">
+<input type="button" name="addToListButton" id="addToListButton" value="Save changes" onclick="editToDoItem(taskId.value, taskName.value, fromDate.value, toDate.value, notes.value)">
 <div id="editToDoItemResult">
 </div>
 </body>
@@ -35,7 +35,7 @@
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 //const ids = JSON.parse(xmlHttp.responseText)
 				//console.log(xmlHttp.responseText)
-				document.getElementById("editToDoItemResult").innerHTML = "<p class='successMessage'>Successfully edited to-do item &quot;" + taskName + "&quot;.</p>"
+				document.getElementById("editToDoItemResult").innerHTML = "<p class='successMessage'>Successfully edited to-do item &quot;" + taskName + "&quot;</p>"
 				document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
 				//document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul>'
             }

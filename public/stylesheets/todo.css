@@ -12,12 +12,20 @@ input[type=text], input[type=number], input[type=password], textarea {
 }
 
 .successMessage {
-	font-weight: strong;
+	font-size: 1.6em;
+	font-weight: bold;
+	color: forestgreen;
 }
 
 .hidden {
 	display: none;
 }
+
 ul#toDoList li {
 	list-style-type: none;
+}
+
+.dateFormat {
+	font-weight: bold;
+	font-family: monospace, sans-serif;
 }

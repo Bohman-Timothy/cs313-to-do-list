@@ -9,7 +9,7 @@
 <% include ../partials/nav.ejs %>
 <h2>Enter Date Range</h2>
 <p>All items that have their beginning-to-end-date-span overlap at least partially with the selected date range will be shown.</p>
-<p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<p>Dates should be given in the format <span class="dateFormat">YYYY-MM-DD</span> (four-digit year, two-digit month, and two-digit day of the month) to be interpreted correctly.</p>
 <label for="fromDate">From Date: </label>
 <input type="text" name="fromDate" id="fromDate" size="10">
 <!--
@@ -70,7 +70,7 @@
                 for (var i = 0; i < ids.length; ++i) {
                     //GetToDoItem(ids[i])
 					//document.getElementById("toDoListResults").innerHTML += xmlHttp.responseText // jsonData
-					document.getElementById("toDoListResults").innerHTML += '<li><input type="button" value="editItem" onclick="linkToEditItem(' + ids[i]["id"] + ')" id="' + ids[i]["id"] + '"> <strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
+					document.getElementById("toDoListResults").innerHTML += '<li><input type="button" value="Edit" onclick="linkToEditItem(' + ids[i]["id"] + ')" id="' + ids[i]["id"] + '"> <input type="button" value="Delete" onclick="deleteToDoItem(' + ids[i]["id"] + ', \'' + ids[i]["thing_to_do"] + '\')" id="' + ids[i]["id"] + '"> <strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li>'
                 }
 				document.getElementById("toDoListResults").innerHTML += "</ul>"
             }
@@ -84,6 +84,23 @@
 	
 	function linkToEditItem (toDoId) {
 		location.href="editItem?id=" + toDoId
+	}
+
+	function deleteToDoItem (toDoId, taskName) {
+        const xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = function() {
+            console.log("Delete function reached")
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                const ids = JSON.parse(xmlHttp.responseText)
+				console.log(xmlHttp.responseText)
+				document.getElementById("toDoListResults").innerHTML = "<p class='successMessage'>Successfully deleted to-do item: &quot;" + taskName + "&quot;</p>"
+			}
+		}
+
+        const query = '/deleteItem?id=' + toDoId
+
+        xmlHttp.open("GET", query, true)
+        xmlHttp.send(null)
 	}
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

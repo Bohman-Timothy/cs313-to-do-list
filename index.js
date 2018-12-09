@@ -119,13 +119,13 @@ function toDoId (request, response) {
     if (typeof(request.query.id) !== "undefined") {
         console.log("ID: " + request.query.id)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + request.query.id, (err, res) => {
-            if (res.rows.length !== 0) {
-                console.log(JSON.stringify(res.rows))
-                return response.json(res.rows)
-            }
-            else {
+            if (err) {
+                console.log(err.stack)
                 errorMessage = 'No match found for ID given'
                 console.log(errorMessage)
+            } else {
+                console.log(JSON.stringify(res.rows))
+                return response.json(res.rows)
             }
         })
     } else {
@@ -172,7 +172,12 @@ function editItem (request, response) {
     if (typeof(request.query.id) !== "undefined") {
         console.log("ID: " + request.query.id)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + request.query.id, (err, res) => {
-            if (res.rows.length !== 0) {
+            if (err) {
+                console.log(err.stack)
+                errorMessage = 'No match found for ID given'
+                console.log(errorMessage)
+            }
+            else {
                 selectedItem = JSON.stringify(res.rows)
                 console.log(selectedItem)
                 id = res.rows[0]["id"]
@@ -194,10 +199,6 @@ function editItem (request, response) {
                     notes: notes
                 });
             }
-            else {
-                errorMessage = 'No match found for ID given'
-                console.log(errorMessage)
-            }
         })
     } else {
         errorMessage = 'No ID given'
@@ -208,7 +209,7 @@ function editItem (request, response) {
     }
 }
 
-//Not yet adapted to edit functionality (instead of add)
+//Submit the query to edit an item with the values received in the request
 function editToDoItem (request, response) {
     var errorMessage
     if (typeof(request.query.id) !== "undefined") {
@@ -225,6 +226,35 @@ function editToDoItem (request, response) {
             }
             else {
                 console.log(res.rows[0])
+                return response.json(res.rows[0])
+            }
+        })
+    } else {
+        errorMessage = 'Insufficient data provided'
+        console.log(errorMessage)
+    }
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
+}
+
+function deleteItem (request, response) {
+    var errorMessage, successMessage
+    if (typeof(request.query.id) !== "undefined") {
+        console.log("ID: " + request.query.id)
+        const deleteQuery = 'DELETE FROM to_do_item WHERE id = ' + request.query.id
+        const qText = 'DELETE FROM to_do_item WHERE id = $1 RETURNING id = $1'
+        const qValues = [request.query.id]
+        console.log('Delete query: ' + deleteQuery)
+        pool.query(qText, qValues, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+                errorMessage = 'Delete failed'
+                console.log(errorMessage)
+            }
+            else {
+                successMessage = 'Successfully deleted ID: ' + request.query.id
+                console.log(successMessage)
                 return response.json(res.rows[0])
             }
         })
