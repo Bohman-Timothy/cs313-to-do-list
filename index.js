@@ -1,26 +1,37 @@
 const {Pool} = require('pg');
 const express = require('express')
 const path = require('path')
+const session = require('express-session')
+const bcrypt = require('bcrypt')
 const PORT = process.env.PORT || 9888
 
-const bodyParser = require('body-parser')
+/*const bodyParser = require('body-parser')
 const htmlParser = bodyParser.text({ type: 'text/html' })
 
 var jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 const { window } = new JSDOM();
 const { document } = (new JSDOM('')).window;
-global.document = document;
+global.document = document;*/
 
 /*let dom = new (require('jsdom').JSDOM)(htmlString);
 let $ = require('jquery')(dom.window);*/
 
-var $ = jQuery = require('jquery')(window);
+//var $ = jQuery = require('jquery')(window);
+
+const saltRounds = 10
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
   //.use(bodyParser.text({ type: 'text/html' }))
-  .use(bodyParser.urlencoded({ extended: true }))
+  //.use(bodyParser.urlencoded({ extended: true }))
+  .use(express.json())
+  .use(express.urlencoded({ extended: false }))
+  .use(session({
+      secret: 'pencils down',
+      resave: false,
+      saveUninitialized: false
+  }))
   .get('/toDoDate', toDoDate)
   .get('/toDoDateSpan', toDoDateSpan)
   .get('/toDoId', toDoId)
@@ -33,14 +44,15 @@ express()
       //res.send(req.body.topContent)
       res.render('pages/login')
   })
+  .post('/login', login)
   .get('/list', (req, res) => res.render('pages/list'))
-  .post('/list', toDoList)
+  //.post('/list', toDoList)  //Requires bodyParser and/or htmlParser to work
   .get('/toDoItem', (req, res) => res.render('pages/to_do_item'))
   .get('/addItem', (req, res) => res.render('pages/add_item'))
   .get('/editItem', editItem)
   .get('/editToDoItem', editToDoItem)
   .get('/deleteItem', deleteItem)
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -53,13 +65,13 @@ function toDoDate (request, response) {
         console.log("Date to Start: " + request.query.date_to_start)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_start= date \'' + request.query.date_to_start + '\'', (err, res) => {
             if (res != "undefined") {
-                if (res.rows.length !== 0) {
-                    console.log(JSON.stringify(res.rows))
-                    return response.json(res.rows)
-                }
-                else {
+                if (err) {
+                    console.log(err.stack)
                     errorMessage = 'No match found for date_to_start'
                     console.log(errorMessage)
+                } else if (res.rows) {
+                    console.log(JSON.stringify(res.rows))
+                    return response.json(res.rows)
                 }
             }
             else {
@@ -71,13 +83,13 @@ function toDoDate (request, response) {
     else if (typeof(request.query.date_to_be_done) !== "undefined") {
         console.log("Date to Be Done: " + request.query.date_to_be_done)
         pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE date_to_be_done = date \'' + request.query.date_to_be_done + '\'', (err, res) => {
-            if (res.rows.length !== 0) {
-                console.log(JSON.stringify(res.rows))
-                return response.json(res.rows)
-            }
-            else {
+            if (err) {
+                console.log(err.stack)
                 errorMessage = 'No match found for date_to_be_done'
                 console.log(errorMessage)
+            } else if (res.rows) {
+                console.log(JSON.stringify(res.rows))
+                return response.json(res.rows)
             }
         })
     }
@@ -96,13 +108,13 @@ function toDoDateSpan (request, response) {
         console.log("Date to Start: " + request.query.date_to_start)
         console.log("Date to Be Done: " + request.query.date_to_be_done)
         pool.query('SELECT id, thing_to_do, notes, to_char(date_to_start, \'YYYY/MM/DD\' :: text) AS date_to_start, to_char(date_to_be_done, \'YYYY/MM/DD\' :: text) AS date_to_be_done FROM to_do_item WHERE (date_to_start >= date \'' + request.query.date_to_start + '\' AND date_to_start <= date \'' + request.query.date_to_be_done + '\') OR (date_to_be_done >= date \'' + request.query.date_to_start + '\' AND date_to_be_done <= date \'' + request.query.date_to_be_done + '\')  ORDER BY date_to_start ASC', (err, res) => {
-            if (res.rows.length !== 0) {
-                console.log(JSON.stringify(res.rows))
-                return response.json(res.rows)
-            }
-            else {
+            if (err) {
+                console.log(err.stack)
                 errorMessage = 'No match found for date span given'
                 console.log(errorMessage)
+            } else if (res.rows) {
+                console.log(JSON.stringify(res.rows))
+                return response.json(res.rows)
             }
         })
     } else {
@@ -123,7 +135,7 @@ function toDoId (request, response) {
                 console.log(err.stack)
                 errorMessage = 'No match found for ID given'
                 console.log(errorMessage)
-            } else {
+            } else if (res.rows) {
                 console.log(JSON.stringify(res.rows))
                 return response.json(res.rows)
             }
@@ -151,7 +163,7 @@ function addToDoItem (request, response) {
                 errorMessage = 'Add failed'
                 console.log(errorMessage)
             }
-            else {
+            else if (res.rows) {
                 console.log(res.rows[0])
                 return response.json(res.rows[0])
             }
@@ -165,7 +177,7 @@ function addToDoItem (request, response) {
     }
 }
 
-//Get data for a single to-do item and prepare that data to be retrieved within the edit item page
+//Get data for a single to-do item and prepare that data to be placed within the edit item page's form; then render the /editItem page containing that data
 function editItem (request, response) {
     var errorMessage
     var thing_to_do, date_to_start, date_to_be_done, notes
@@ -177,7 +189,7 @@ function editItem (request, response) {
                 errorMessage = 'No match found for ID given'
                 console.log(errorMessage)
             }
-            else {
+            else if (res.rows) {
                 selectedItem = JSON.stringify(res.rows)
                 console.log(selectedItem)
                 id = res.rows[0]["id"]
@@ -224,7 +236,7 @@ function editToDoItem (request, response) {
                 errorMessage = 'Update failed'
                 console.log(errorMessage)
             }
-            else {
+            else if (res.rows) {
                 console.log(res.rows[0])
                 return response.json(res.rows[0])
             }
@@ -267,15 +279,55 @@ function deleteItem (request, response) {
     }
 }
 
-function login() {
+function login (req, res) {
+    var loggedIn = false
+    console.log('Logging in as: ' + req.body.username)
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(hash);
+        }
+    });
 
+    const userQuery = "SELECT password FROM to_do_list_user WHERE username='" + req.body.username + "'"
+    qText = "SELECT password FROM to_do_list_user WHERE username = $1"
+    qValues = [req.body.username]
+    pool.query(qText, qValues, (error, response => {
+        if (error) {
+            console.log(error)
+            res.send(loggedIn)
+        }
+        else if (response.rows) {
+            bcrypt.compare(req.body.password, response.rows[0].password, function (err, resp) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    req.session.username = req.body.username
+                    console.log('Successfully logged in as session user: ' + req.session.username)
+                }
+                res.send(loggedIn)
+            });
+        }
+    }));
 }
 
 function loginForm() {
 
 }
 
+function logout (req, res) {
+    var loggedOut
+    if (req.session.username) {
+        req.session.destroy(function (err) {})
+        loggedOut = true
+    } else {
+        loggedOut = false
+    }
+    res.send(loggedOut)
+}
 
+//Does NOT work. An attempt at using jQuery.
 /*$("#selectId").submit(function(e) {
     e.preventDefault()*/
     /*const target = "/toDoId?id=" + $("#toDoId").val() //get to-do item ID from form
@@ -287,6 +339,7 @@ function loginForm() {
     })
 })*/
 
+//Does NOT work. An attempt at using jQuery.
 /*$("#buttonItemId").click(function() {
 $("p").hide()
 })*/
@@ -294,20 +347,21 @@ $("p").hide()
 function retrieveToDoItemId (selectedId) {
     console.log(selectedId)
     pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
-        if (res.rows.length !== 0) {
-            console.log(JSON.stringify(res.rows))
-            return response.json(res.rows)
-        }
-        else {
+        if (err) {
+            console.log(err.stack)
             errorMessage = 'No match found for ID given'
             console.log(errorMessage)
+        } else {
+            console.log(JSON.stringify(res.rows))
+            return response.json(res.rows)
         }
     })
     /*const target = "/toDoId?id=" + $("#toDoId").val() //get to-do item ID from form
     console.log(target)*/
 }
 
-function toDoList (request, response, next) {
+//Retrieves just one item, according to ID given. Does work, but requires bodyParser and/or htmlParser, which are commented out near the beginning of this file. Also needs the form that is commented out on the /list page.
+/*function toDoList (request, response, next) {
     //res.render('partials/list')
     const selectedId = request.body.toDoId
     const toDoIdJquery = $("#toDoId").val()
@@ -317,26 +371,21 @@ function toDoList (request, response, next) {
     console.log(data)
     //retrieveToDoItemId(toDoId)
     pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
-        if (res.rows.length !== 0) {
-            console.log(JSON.stringify(res.rows))
-            /*for (var i = 0; i < res.rows.length; ++i) {
-                const
-            }
-            res.render('pages/toDoItem', {
-                weight: weight,
-                weightUnit: weightUnit,
-                mailType: mailType,
-                postage: postage
-            });*/
-            //return response.json(res.rows)
-            //request.body.to_do_list_results.innerHTML += JSON.stringify(res.rows)
-        }
-        else {
+        if (err) {
+            console.log(err.stack)
             errorMessage = 'No match found for ID given'
             console.log(errorMessage)
             console.log(err)
         }
+        else {
+            console.log(JSON.stringify(res.rows))
+            return response.json(res.rows)
+            //request.body.to_do_list_results.innerHTML += JSON.stringify(res.rows)
+        }
     })
+}*/
+
+//Does NOT work. An attempt to utilize jQuery.
 /*function toDoList () {
     $("#selectId").submit(function(e) {
         e.preventDefault()
@@ -348,7 +397,7 @@ function toDoList (request, response, next) {
     /*const target = "/toDoId?id=" + req.body.toDoId //get to-do item ID from form
     console.log(target)
     res.redirect(target)*/
-}
+//}
 
 function displayToDoItems () {
 }
@@ -417,4 +466,7 @@ Stack Overflow - How can I find the last insert ID with Node.js and Postgresql?
 
 https://stackoverflow.com/questions/503093/how-do-i-redirect-to-another-webpage
 Stack Overflow - How do I redirect to another webpage? [JavaScript]
+
+https://github.com/byui-cs/cs313-course/blob/master/week12/ta-solution/public/test.js
+CS313 Week 12 Teacher's Solution - test.js
  */

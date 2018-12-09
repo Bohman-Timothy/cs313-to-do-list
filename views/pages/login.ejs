@@ -4,8 +4,6 @@
     <% include ../partials/head.ejs %>
     <title>Sign In</title>
 </head>
-<script>
-</script>
 <body>
 <h1>Sign In</h1>
 <% include ../partials/nav.ejs %>
@@ -14,8 +12,24 @@
 <input type="text" name="username" id="username" required value=""><br/>
 <label for="password">Enter Password:</label>
 <input type="password" name="password" id="password" required><br/>
-<input type="submit" name="submit" value="Log In" class="submitButton" onclick="login(username.value, password.value)">
-<div id="login_result">
+<input type="button" name="login" value="Log In" class="submitButton" onclick="login(username.value, password.value)">
+<div id="loginResult">
 </div>
 </body>
+<script>
+function login (username, password) {
+	var loginDetails = {
+		username: username,
+		password: password
+	}
+
+	$.post("/login", loginDetails function (result) {
+		if (result) {
+			$(#"loginResult").text("<p class='successMessage'>Logged in as " + username + ".</p>")
+		} else {
+			$(#"loginResult").text("<p class='errorMessage'>Error logging in.</p>")
+		}
+	}
+}
+</script>
 </html>
