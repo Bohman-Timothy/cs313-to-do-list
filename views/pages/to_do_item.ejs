@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <% include ../partials/head.ejs %>
   <title>To-Do Item Details</title>
 </head>
 <body>
@@ -9,10 +9,10 @@
 <label for="toDoId">ID: </label>
 <input type="number" name="toDoId" id="toDoId">
 <br/>
-<input type="button" name="submit" id="buttonItemId" value="Display To-Do Item" onclick="GetToDoItem(toDoId.value)">
+<input type="button" name="submitItemId" id="buttonItemId" value="Display To-Do Item" onclick="GetToDoItem(toDoId.value)">
 
 <h2>Enter Date Range</h2>
-<p>Dates should be given in the format <strong><pre>YYYY-MM-DD</pre></strong> to be interpreted correctly.</p>
+<p>Dates should be given in the format <span class="dateFormat">YYYY-MM-DD</span> to be interpreted correctly.</p>
 <label for="fromDate">From Date: </label>
 <input type="text" name="fromDate" id="fromDate">
 <br/>
@@ -84,6 +84,11 @@
         xmlHttp.open("GET", query, true)
         xmlHttp.send(null)
     }
+
+	//Testing the use of jQuery.
+	$("#buttonItemId").click(function() {
+		$("p").hide()
+	})
 </script>
 </body>
 </html>

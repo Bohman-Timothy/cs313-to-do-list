@@ -17,12 +17,25 @@ input[type=text], input[type=number], input[type=password], textarea {
 	color: forestgreen;
 }
 
+.statusMessage {
+	font-style: italic;
+}
+
 .hidden {
 	display: none;
 }
 
-ul#toDoList li {
+.toDoList {
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+}
+
+.toDoDetails {
 	list-style-type: none;
+	padding-top: 0;
+	margin-top: 0;
+	padding-left: 0;
+	margin-left: 1.5em;
 }
 
 .dateFormat {
