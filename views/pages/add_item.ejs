@@ -13,10 +13,10 @@
 <input type="text" name="taskName" id="taskName" size="40">
 <br/>
 <label for="fromDate">Date to Start: </label>
-<input type="text" name="fromDate" id="fromDate" size="10">
+<input type="text" name="fromDate" id="fromDate" size="10" pattern="[0-9]{4}-[0-1][0-9]-[0-3][0-9]">
 <br/>
 <label for="toDate">Date to Be Done: </label>
-<input type="text" name="toDate" id="toDate" size="10">
+<input type="text" name="toDate" id="toDate" size="10" pattern="[0-9]{4}-[0-1][0-9]-[0-3][0-9]">
 <br/>
 <label for="notes">Task Notes:</label><br/>
 <textarea name="notes" id="notes" rows="6" cols="50"></textarea>
@@ -27,6 +27,7 @@
 </body>
 <script>
     function addToDoItem (taskName, fromDate, toDate, notes) {
+		var success = false
         const xmlHttp = new XMLHttpRequest()
         xmlHttp.onreadystatechange = function() {
             console.log("addToDoItem function reached")
@@ -36,8 +37,12 @@
 				document.getElementById("addToListResult").innerHTML = "<p class='successMessage'>Successfully added to-do item &quot;" + taskName + "&quot;</p>"
 				document.getElementById("addToListResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
 				//document.getElementById("addToListResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids["date_to_start"] + ' <strong>End Date:</strong> ' + ids["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids["notes"] + '</li></ul>'
+				success = true
             }
         }
+		if (success === false) {
+			document.getElementById("addToListResult").innerHTML = "<p class='errorMessage'>Failed to add to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
+		}
 
         const query = '/addToDoItem?thing_to_do=' + taskName + '&notes=' + notes + '&date_to_start=' + fromDate + '&date_to_be_done=' + toDate
 

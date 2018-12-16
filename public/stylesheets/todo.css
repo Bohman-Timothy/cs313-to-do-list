@@ -1,6 +1,9 @@
 body {
 	background-color: RGB(255, 238, 230);
 	color: rgb(92, 0, 92);
+	max-width: 1000px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 input:focus, textarea:focus {
@@ -15,6 +18,12 @@ input[type=text], input[type=number], input[type=password], textarea {
 	font-size: 1.6em;
 	font-weight: bold;
 	color: forestgreen;
+}
+
+.errorMessage {
+	font-size: 1.6em;
+	font-weight: bold;
+	color: darkred;
 }
 
 .statusMessage {

@@ -14,10 +14,10 @@
 <input type="text" name="taskName" id="taskName" size="40" value="<%= thing_to_do %>">
 <br/>
 <label for="fromDate">Date to Start: </label>
-<input type="text" name="fromDate" id="fromDate" size="10" value="<%= date_to_start %>">
+<input type="text" name="fromDate" id="fromDate" size="10" value="<%= date_to_start %>" pattern="[0-9]{4}-[0-1][0-9]-[0-3][0-9]">
 <br/>
 <label for="toDate">Date to Be Done: </label>
-<input type="text" name="toDate" id="toDate" size="10" value="<%= date_to_be_done %>">
+<input type="text" name="toDate" id="toDate" size="10" value="<%= date_to_be_done %>" pattern="[0-9]{4}-[0-1][0-9]-[0-3][0-9]">
 <br/>
 <label for="notes">Task Notes:</label><br/>
 <textarea name="notes" id="notes" rows="6" cols="50"><%= notes %></textarea>
@@ -29,17 +29,30 @@
 <script>
     function editToDoItem (taskId, taskName, fromDate, toDate, notes) {
 	    console.log("editToDoItem function reached")
+		var success = false
         const xmlHttp = new XMLHttpRequest()
         xmlHttp.onreadystatechange = function() {
             console.log("editToDoItem AJAX function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 //const ids = JSON.parse(xmlHttp.responseText)
-				//console.log(xmlHttp.responseText)
-				document.getElementById("editToDoItemResult").innerHTML = "<p class='successMessage'>Successfully edited to-do item &quot;" + taskName + "&quot;</p>"
-				document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
-				//document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul>'
+				console.log(xmlHttp.responseText)
+				if (xmlHttp.responseText === "success") {
+					document.getElementById("editToDoItemResult").innerHTML = "<p class='successMessage'>Successfully updated to-do item &quot;" + taskName + "&quot;</p>"
+					document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
+					//document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul>'
+					success = true
+				}
+				/*else if (xmlHttp.responseText === "error") {
+					document.getElementById("editToDoItemResult").innerHTML = "<p>" + xmlHttp.responseText + "</p> <p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
+				}*/
             }
+			/*else {
+				console.log("xmlHttp.readyState: " + xmlHttp.readyState + " xmlHttp.status: " + xmlHttp.status)
+			}*/
         }
+		if (success === false) {
+			document.getElementById("editToDoItemResult").innerHTML = "<p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
+		}
 
         const query = '/editToDoItem?id=' + taskId + '&thing_to_do=' + taskName + '&notes=' + notes + '&date_to_start=' + fromDate + '&date_to_be_done=' + toDate
 

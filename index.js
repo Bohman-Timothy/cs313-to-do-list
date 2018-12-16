@@ -156,7 +156,7 @@ function addToDoItem (request, response) {
         const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')  RETURNING id'
         const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5) RETURNING id, thing_to_do, notes, date_to_start, date_to_be_done'
         const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
-        console.log('Insert query:' + insertQuery)
+        console.log('Insert query: ' + insertQuery)
         pool.query(qText, qValues, (err, res) => {
             if (err) {
                 console.log(err.stack)
@@ -229,7 +229,7 @@ function editToDoItem (request, response) {
         const updateQuery = 'UPDATE to_do_item (thing_to_do, notes, date_to_start, date_to_be_done, date_modified) VALUES (\'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\'' + ' \'now()\') WHERE id = ' + request.query.id + ';'
         const qText = 'UPDATE to_do_item SET thing_to_do = $1, notes = $2, date_to_start = $3, date_to_be_done = $4, date_modified = $5 WHERE id = $6 RETURNING thing_to_do'
         const qValues = [request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done, 'now()', request.query.id]
-        console.log('Update query:' + updateQuery)
+        console.log('Update query: ' + updateQuery)
         pool.query(qText, qValues, (err, res) => {
             if (err) {
                 console.log(err.stack)
@@ -238,7 +238,7 @@ function editToDoItem (request, response) {
             }
             else if (res.rows) {
                 console.log(res.rows[0])
-                return response.json(res.rows[0])
+                return response.send("success")
             }
         })
     } else {
@@ -246,7 +246,7 @@ function editToDoItem (request, response) {
         console.log(errorMessage)
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send("error")
     }
 }
 
@@ -469,4 +469,7 @@ Stack Overflow - How do I redirect to another webpage? [JavaScript]
 
 https://github.com/byui-cs/cs313-course/blob/master/week12/ta-solution/public/test.js
 CS313 Week 12 Teacher's Solution - test.js
+
+https://www.w3schools.com/tags/att_input_pattern.asp
+W3Schools - HTML <input> pattern Attribute
  */

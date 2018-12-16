@@ -93,14 +93,19 @@
 	}
 
 	function deleteToDoItem (toDoId, taskName) {
+		var success = false
         const xmlHttp = new XMLHttpRequest()
         xmlHttp.onreadystatechange = function() {
             console.log("Delete function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                const ids = JSON.parse(xmlHttp.responseText)
+                //const ids = JSON.parse(xmlHttp.responseText)
 				console.log(xmlHttp.responseText)
 				document.getElementById("toDoListResults").innerHTML = "<p class='successMessage'>Successfully deleted to-do item: &quot;" + taskName + "&quot;</p>"
-			}
+				success = true
+            }
+        }
+		if (success === false) {
+			document.getElementById("toDoListResults").innerHTML = "<p class='errorMessage'>Failed to delete to-do item &quot;" + taskName + "&quot;</p>"
 		}
 
         const query = '/deleteItem?id=' + toDoId
