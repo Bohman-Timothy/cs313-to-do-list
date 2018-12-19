@@ -33,18 +33,17 @@
             console.log("addToDoItem function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 const ids = JSON.parse(xmlHttp.responseText)
-				console.log(xmlHttp.responseText)
+				console.log(ids)
 				if (ids.errorMessage) {
-					document.getElementById("addToListResult").innerHTML = "<p class='errorMessage'>Failed to add to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p> <p>Error: " + ids.errorMessage + "</p>"
+					document.getElementById("addToListResult").innerHTML = "<p class='errorMessage'>Failed to add to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p> <p>Also note that only logged-in users can add to-do items.</p> <p>Error: " + ids.errorMessage + "</p>"
 				} else {
 				document.getElementById("addToListResult").innerHTML = "<p class='successMessage'>Successfully added to-do item &quot;" + taskName + "&quot;</p>"
 				document.getElementById("addToListResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
-				//document.getElementById("addToListResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids["date_to_start"] + ' <strong>End Date:</strong> ' + ids["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids["notes"] + '</li></ul>'
 				success = true
 				}
             }
 			if (success === false) {
-				document.getElementById("addToListResult").innerHTML = "<p class='errorMessage'>Failed to add to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
+				document.getElementById("addToListResult").innerHTML = "<p class='errorMessage'>Failed to add to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p> <p>Also note that only logged-in users can add to-do items.</p>"
 			}
         }
 

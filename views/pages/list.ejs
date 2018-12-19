@@ -35,6 +35,7 @@
 <h2>To-Do Items</h2>
 <div id="toDoListResults">
 <p class="statusMessage">Select a date range above to view to-do items.</p>
+<p class="statusMessage">Only logged-in users can view to-do items.</p>
 </div>
 
 <script>
@@ -66,10 +67,10 @@
         xmlHttp.onreadystatechange = function() {
             console.log("List function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-				console.log(xmlHttp.responseText)
                 const ids = JSON.parse(xmlHttp.responseText)
-				if ((ids.length === 0) || (xmlHttp.responseText[0] === 'N')) {
-					document.getElementById("toDoListResults").innerHTML = '<p class="statusMessage">No results to display.</p>'
+				console.log(ids)
+				if ((ids.length === 0) || (ids.errorMessage)) {
+					document.getElementById("toDoListResults").innerHTML = '<p class="statusMessage">No results to display.</p> <p class="statusMessage">Only logged-in users can view to-do items.</p>'
 				}
 				else {
 					var fullListHtml = '<ol class="toDoList">'

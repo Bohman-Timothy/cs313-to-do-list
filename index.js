@@ -40,7 +40,7 @@ express()
   /*.get('/login', login)*/
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
-  .get('/', (req, res) => res.render('pages/list'))
+  .get('/', (req, res) => res.render('pages/login'))
   .get('/login', function (req, res) {
       //res.send(req.body.topContent)
       res.render('pages/login')
@@ -142,7 +142,7 @@ function toDoDateSpanUser (request, response) {
                     console.log(err.stack)
                     errorMessage = 'No match found for date span given'
                     console.log(errorMessage)
-                    return response.send(errorMessage)
+                    return response.send({errorMessage : errorMessage})
                 } else if (res.rows) {
                     console.log(JSON.stringify(res.rows))
                     return response.json(res.rows)
@@ -151,15 +151,15 @@ function toDoDateSpanUser (request, response) {
         } else {
             errorMessage = 'No date given'
             console.log(errorMessage)
-            return response.send(errorMessage)
+            return response.send({errorMessage : errorMessage})
         }
     } else {
         errorMessage = 'No user logged in'
         console.log(errorMessage)
-        return response.send(errorMessage)
+        return response.send({errorMessage : errorMessage})
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send({errorMessage : 'See log for error message'})
     }
 }
 
@@ -218,7 +218,7 @@ function addToDoItem (request, response) {
         return response.send({errorMessage : errorMessage})
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send({errorMessage : 'See log for error message'})
     }
 }
 
@@ -233,6 +233,7 @@ function editItemGet (request, response) {
                 console.log(err.stack)
                 errorMessage = 'No match found for ID given'
                 console.log(errorMessage)
+                return response.send({errorMessage : errorMessage})
             }
             else if (res.rows) {
                 selectedItem = JSON.stringify(res.rows)
@@ -260,9 +261,10 @@ function editItemGet (request, response) {
     } else {
         errorMessage = 'No ID given'
         console.log(errorMessage)
+        return response.send({errorMessage : errorMessage})
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send({errorMessage : 'See log for error message'})
     }
 }
 
@@ -287,6 +289,7 @@ function editItem (request, response) {
                 console.log(err.stack)
                 errorMessage = 'No match found for ID given'
                 console.log(errorMessage)
+                response.send({errorMessage : errorMessage})
             }
             else if (res.rows) {
                 selectedItem = JSON.stringify(res.rows)
@@ -328,16 +331,17 @@ function editItem (request, response) {
     } else {
         errorMessage = 'No ID given'
         console.log(errorMessage)
-        response.send(errorMessage)
+        response.send({errorMessage : errorMessage})
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send({errorMessage : 'See log for error message'})
     }
 }
 
 //Submit the query to edit an item with the values received in the request
 function editToDoItem (request, response) {
     var errorMessage
+    var success = false
     if (typeof(request.query.id) !== "undefined") {
         console.log("ID: " + request.query.id + " Thing to do: " + request.query.thing_to_do)
         const updateQuery = 'UPDATE to_do_item (thing_to_do, notes, date_to_start, date_to_be_done, date_modified) VALUES (\'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\'' + ' \'now()\') WHERE id = ' + request.query.id + ';'
@@ -349,19 +353,21 @@ function editToDoItem (request, response) {
                 console.log(err.stack)
                 errorMessage = 'Update failed'
                 console.log(errorMessage)
-                return response.send(errorMessage)
+                return response.send({errorMessage : errorMessage, success : success})
             }
             else if (res.rows) {
                 console.log(res.rows[0])
-                return response.send("success")
+                success = true
+                return response.send({errorMessage : errorMessage, success : success})
             }
         })
     } else {
         errorMessage = 'Insufficient data provided'
         console.log(errorMessage)
+        return response.send({errorMessage : errorMessage, success : success})
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send({errorMessage : 'See log for error message', success : success})
     }
 }
 
@@ -378,7 +384,7 @@ function deleteItem (request, response) {
                 console.log(err.stack)
                 errorMessage = 'Delete failed'
                 console.log(errorMessage)
-                return response.send(errorMessage)
+                return response.send({errorMessage : errorMessage})
             }
             else {
                 successMessage = 'Successfully deleted ID: ' + request.query.id
@@ -389,9 +395,10 @@ function deleteItem (request, response) {
     } else {
         errorMessage = 'Insufficient data provided'
         console.log(errorMessage)
+        return response.send({errorMessage : errorMessage})
     }
     if (errorMessage) {
-        return response.send('<p>See log for error message</p>')
+        return response.send({errorMessage : 'See log for error message'})
     }
 }
 

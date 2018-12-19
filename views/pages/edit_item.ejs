@@ -34,20 +34,19 @@
         xmlHttp.onreadystatechange = function() {
             console.log("editToDoItem AJAX function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                //const ids = JSON.parse(xmlHttp.responseText)
-				console.log(xmlHttp.responseText)
-				if (xmlHttp.responseText === "success") {
+                const ids = JSON.parse(xmlHttp.responseText)
+				console.log(ids)
+				if (ids.errorMessage) {
+					document.getElementById("addToListResult").innerHTML = "<p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p> <p>Also note that only logged-in users can edit to-do items.</p> <p>Error: " + ids.errorMessage + "</p>"
+				}
+				if (ids.success) {
 					document.getElementById("editToDoItemResult").innerHTML = "<p class='successMessage'>Successfully updated to-do item &quot;" + taskName + "&quot;</p>"
 					document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + taskName + '<br/> <strong>Start Date:</strong> ' + fromDate + ' <strong>End Date:</strong> ' + toDate + '<br/> <strong>Notes:</strong> ' + notes + '</li></ul>'
-					//document.getElementById("editToDoItemResult").innerHTML += '<ul><li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + '<br/> <strong>Start Date:</strong> ' + ids[i]["date_to_start"] + ' <strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '<br/> <strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul>'
 					success = true
 				}
-				/*else if (xmlHttp.responseText === "error") {
-					document.getElementById("editToDoItemResult").innerHTML = "<p>" + xmlHttp.responseText + "</p> <p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
-				}*/
             }
 			if (success === false) {
-				document.getElementById("editToDoItemResult").innerHTML = "<p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
+				document.getElementById("editToDoItemResult").innerHTML = "<p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p> <p>Also note that only logged-in users can edit to-do items.</p>"
 			}
 
 			console.log("xmlHttp.readyState: " + xmlHttp.readyState + " xmlHttp.status: " + xmlHttp.status)
