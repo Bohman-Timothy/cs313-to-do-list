@@ -51,7 +51,8 @@ express()
   //.post('/list', toDoList)  //Requires bodyParser and/or htmlParser to work
   .get('/toDoItem', (req, res) => res.render('pages/to_do_item'))
   .get('/addItem', (req, res) => res.render('pages/add_item'))
-  .get('/editItem', editItem)
+  .get('/editItem', editItemGet)
+  .post('/editItem', editItem)
   .get('/editToDoItem', editToDoItem)
   .get('/deleteItem', deleteItem)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
@@ -222,7 +223,7 @@ function addToDoItem (request, response) {
 }
 
 //Get data for a single to-do item and prepare that data to be placed within the edit item page's form; then render the /editItem page containing that data
-function editItem (request, response) {
+function editItemGet (request, response) {
     var errorMessage
     var thing_to_do, date_to_start, date_to_be_done, notes
     if (typeof(request.query.id) !== "undefined") {
@@ -259,6 +260,67 @@ function editItem (request, response) {
     } else {
         errorMessage = 'No ID given'
         console.log(errorMessage)
+    }
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
+}
+
+//Get data (POST request) for a single to-do item and prepare that data to be placed within the edit item page's form; then render the /editItem page containing that data
+function editItem (request, response) {
+    var errorMessage
+    var thing_to_do, date_to_start, date_to_be_done, notes
+    const htmlPage = "pages/edit_item"
+    //console.log(request.body)
+    if (typeof(request.body.toDoId) !== "undefined") {
+        console.log("ID: " + request.body.toDoId)
+        pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + request.body.toDoId, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+                errorMessage = 'No match found for ID given'
+                console.log(errorMessage)
+            }
+            else if (res.rows) {
+                selectedItem = JSON.stringify(res.rows)
+                console.log(selectedItem)
+                id = res.rows[0]["id"]
+                thing_to_do = res.rows[0]["thing_to_do"]
+                date_to_start = res.rows[0]["date_to_start"].toISOString().
+                replace(/T.+/, '')
+                date_to_be_done = res.rows[0]["date_to_be_done"].toISOString().
+                replace(/T.+/, '')
+                notes = res.rows[0]["notes"]
+                console.log(id)
+                console.log(thing_to_do)
+                console.log(date_to_start)
+                console.log(date_to_be_done)
+                console.log(notes)
+                response.render('pages/edit_item'), {
+                    id: id,
+                    thing_to_do: thing_to_do,
+                    date_to_start: date_to_start,
+                    date_to_be_done: date_to_be_done,
+                    notes: notes
+                })
+                //response.send(htmlPage)
+                /*, function (err, htmlPage) {
+                    if (err) {
+                        console.log(err)
+                        errorMessage = "Failed to load Edit Item page"
+                        console.log(errorMessage)
+                        response.send(errorMessage)
+                    } else {
+                        console.log(htmlPage)
+                        response.send(htmlPage)
+                    }
+                });*/
+
+            }
+        })
+    } else {
+        errorMessage = 'No ID given'
+        console.log(errorMessage)
+        response.send(errorMessage)
     }
     if (errorMessage) {
         return response.send('<p>See log for error message</p>')
@@ -530,4 +592,7 @@ W3Schools - HTML <input> pattern Attribute
 
 https://www.w3schools.com/jquery/html_text.asp
 W3Schools - jQuery text() Method [Note about using html() method instead]
+
+https://stackoverflow.com/questions/36144081/res-render-not-rendering
+Stack Overflow - Res.render() not rendering
  */
