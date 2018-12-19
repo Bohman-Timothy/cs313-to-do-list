@@ -295,7 +295,7 @@ function editItem (request, response) {
                 console.log(date_to_start)
                 console.log(date_to_be_done)
                 console.log(notes)
-                response.render('pages/edit_item'), {
+                response.render('pages/edit_item', {
                     id: id,
                     thing_to_do: thing_to_do,
                     date_to_start: date_to_start,
