@@ -66,9 +66,9 @@
         xmlHttp.onreadystatechange = function() {
             console.log("List function reached")
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                const ids = JSON.parse(xmlHttp.responseText)
 				console.log(xmlHttp.responseText)
-				if (ids.length === 0) {
+                const ids = JSON.parse(xmlHttp.responseText)
+				if ((ids.length === 0) || (xmlHttp.responseText[0] === 'N')) {
 					document.getElementById("toDoListResults").innerHTML = '<p class="statusMessage">No results to display.</p>'
 				}
 				else {
@@ -82,7 +82,7 @@
             }
         }
 
-        const query = '/toDoDateSpan?date_to_start=' + fromDate + '&date_to_be_done=' + toDate
+        const query = '/toDoDateSpanUser?date_to_start=' + fromDate + '&date_to_be_done=' + toDate
 
         xmlHttp.open("GET", query, true)
         xmlHttp.send(null)
@@ -103,10 +103,10 @@
 				document.getElementById("toDoListResults").innerHTML = "<p class='successMessage'>Successfully deleted to-do item: &quot;" + taskName + "&quot;</p>"
 				success = true
             }
+			if (success === false) {
+				document.getElementById("toDoListResults").innerHTML = "<p class='errorMessage'>Failed to delete to-do item &quot;" + taskName + "&quot;</p>"
+			}
         }
-		if (success === false) {
-			document.getElementById("toDoListResults").innerHTML = "<p class='errorMessage'>Failed to delete to-do item &quot;" + taskName + "&quot;</p>"
-		}
 
         const query = '/deleteItem?id=' + toDoId
 

@@ -34,6 +34,7 @@ express()
   }))
   .get('/toDoDate', toDoDate)
   .get('/toDoDateSpan', toDoDateSpan)
+  .get('/toDoDateSpanUser', toDoDateSpanUser)
   .get('/toDoId', toDoId)
   .get('/addToDoItem', addToDoItem)
   /*.get('/login', login)*/
@@ -45,6 +46,7 @@ express()
       res.render('pages/login')
   })
   .post('/login', login)
+  .post('/logout', logout)
   .get('/list', (req, res) => res.render('pages/list'))
   //.post('/list', toDoList)  //Requires bodyParser and/or htmlParser to work
   .get('/toDoItem', (req, res) => res.render('pages/to_do_item'))
@@ -126,6 +128,40 @@ function toDoDateSpan (request, response) {
     }
 }
 
+function toDoDateSpanUser (request, response) {
+    sess = request.session
+    var errorMessage
+    if (typeof(sess.userId) !== "undefined") {
+        if ((typeof(request.query.date_to_start) !== "undefined") && (typeof(request.query.date_to_be_done) !== "undefined")) {
+            console.log("Date to Start: " + request.query.date_to_start)
+            console.log("Date to Be Done: " + request.query.date_to_be_done)
+            console.log("User ID: " + request.session.userId)
+            pool.query('SELECT id, thing_to_do, notes, to_char(date_to_start, \'YYYY/MM/DD\' :: text) AS date_to_start, to_char(date_to_be_done, \'YYYY/MM/DD\' :: text) AS date_to_be_done FROM to_do_item WHERE (((date_to_start >= date \'' + request.query.date_to_start + '\' AND date_to_start <= date \'' + request.query.date_to_be_done + '\') OR (date_to_be_done >= date \'' + request.query.date_to_start + '\' AND date_to_be_done <= date \'' + request.query.date_to_be_done + '\')) AND user_id_fk = ' + sess.userId + ') ORDER BY date_to_start ASC', (err, res) => {
+                if (err) {
+                    console.log(err.stack)
+                    errorMessage = 'No match found for date span given'
+                    console.log(errorMessage)
+                    return response.send(errorMessage)
+                } else if (res.rows) {
+                    console.log(JSON.stringify(res.rows))
+                    return response.json(res.rows)
+                }
+            })
+        } else {
+            errorMessage = 'No date given'
+            console.log(errorMessage)
+            return response.send(errorMessage)
+        }
+    } else {
+        errorMessage = 'No user logged in'
+        console.log(errorMessage)
+        return response.send(errorMessage)
+    }
+    if (errorMessage) {
+        return response.send('<p>See log for error message</p>')
+    }
+}
+
 function toDoId (request, response) {
     var errorMessage
     if (typeof(request.query.id) !== "undefined") {
@@ -151,26 +187,34 @@ function toDoId (request, response) {
 
 function addToDoItem (request, response) {
     var errorMessage
-    if (typeof(request.query.thing_to_do) !== "undefined") {
-        console.log("Thing to do: " + request.query.thing_to_do)
-        const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')  RETURNING id'
-        const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5) RETURNING id, thing_to_do, notes, date_to_start, date_to_be_done'
-        const qValues = [1, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
-        console.log('Insert query: ' + insertQuery)
-        pool.query(qText, qValues, (err, res) => {
-            if (err) {
-                console.log(err.stack)
-                errorMessage = 'Add failed'
-                console.log(errorMessage)
-            }
-            else if (res.rows) {
-                console.log(res.rows[0])
-                return response.json(res.rows[0])
-            }
-        })
+    if (typeof(request.session.userId) !== "undefined") {
+        if ((typeof(request.query.thing_to_do) !== "undefined") && (typeof(request.query.date_to_start) !== "undefined") && (typeof(request.query.date_to_be_done) !== "undefined")) {
+            console.log("Thing to do: " + request.query.thing_to_do)
+            const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')  RETURNING id'
+            const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5) RETURNING id, thing_to_do, notes, date_to_start, date_to_be_done'
+            const qValues = [request.session.userId, request.query.thing_to_do, request.query.notes, request.query.date_to_start, request.query.date_to_be_done]
+            console.log('Insert query: ' + insertQuery)
+            pool.query(qText, qValues, (err, res) => {
+                if (err) {
+                    console.log(err.stack)
+                    errorMessage = 'Add failed'
+                    console.log(errorMessage)
+                    return response.send({errorMessage : errorMessage})
+                }
+                else if (res.rows) {
+                    console.log(res.rows[0])
+                    return response.json(res.rows[0])
+                }
+            })
+        } else {
+            errorMessage = 'Insufficient data provided'
+            console.log(errorMessage)
+            return response.send({errorMessage : errorMessage})
+        }
     } else {
-        errorMessage = 'Insufficient data provided'
+        errorMessage = 'No user logged in'
         console.log(errorMessage)
+        return response.send({errorMessage : errorMessage})
     }
     if (errorMessage) {
         return response.send('<p>See log for error message</p>')
@@ -235,6 +279,7 @@ function editToDoItem (request, response) {
                 console.log(err.stack)
                 errorMessage = 'Update failed'
                 console.log(errorMessage)
+                return response.send(errorMessage)
             }
             else if (res.rows) {
                 console.log(res.rows[0])
@@ -246,7 +291,7 @@ function editToDoItem (request, response) {
         console.log(errorMessage)
     }
     if (errorMessage) {
-        return response.send("error")
+        return response.send('<p>See log for error message</p>')
     }
 }
 
@@ -263,6 +308,7 @@ function deleteItem (request, response) {
                 console.log(err.stack)
                 errorMessage = 'Delete failed'
                 console.log(errorMessage)
+                return response.send(errorMessage)
             }
             else {
                 successMessage = 'Successfully deleted ID: ' + request.query.id
@@ -282,34 +328,40 @@ function deleteItem (request, response) {
 function login (req, res) {
     var loggedIn = false
     console.log('Logging in as: ' + req.body.username)
-    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+    bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
         if (err) {
             console.log(err);
+            res.send({loggedIn : loggedIn})
         } else {
-            console.log(hash);
+            //console.log(hash);
         }
     });
 
-    const userQuery = "SELECT password FROM to_do_list_user WHERE username='" + req.body.username + "'"
-    qText = "SELECT password FROM to_do_list_user WHERE username = $1"
+    const userQuery = "SELECT id, password FROM to_do_list_user WHERE username='" + req.body.username + "'"
+    qText = "SELECT id, password FROM to_do_list_user WHERE username = $1"
     qValues = [req.body.username]
-    pool.query(qText, qValues, (error, response => {
+    pool.query(qText, qValues, function (error, response) {
         if (error) {
             console.log(error)
-            res.send(loggedIn)
+            res.send({loggedIn : loggedIn})
         }
         else if (response.rows) {
             bcrypt.compare(req.body.password, response.rows[0].password, function (err, resp) {
                 if (err) {
                     console.log(err)
-                } else {
+                } else if (resp === true) {
                     req.session.username = req.body.username
+                    req.session.userId = response.rows[0].id
                     console.log('Successfully logged in as session user: ' + req.session.username)
+                    loggedIn = true
                 }
-                res.send(loggedIn)
+                res.send({loggedIn : loggedIn})
             });
         }
-    }));
+        else {
+            res.send({loggedIn : loggedIn})
+        }
+    });
 }
 
 function loginForm() {
@@ -317,14 +369,17 @@ function loginForm() {
 }
 
 function logout (req, res) {
-    var loggedOut
+    var loggedOut = false
+    var alreadyLoggedOut = false
     if (req.session.username) {
+        console.log('Logging out session user: ' + req.session.username)
         req.session.destroy(function (err) {})
         loggedOut = true
+        console.log('Successfully logged out')
     } else {
-        loggedOut = false
+        alreadyLoggedOut = true
     }
-    res.send(loggedOut)
+    res.send({loggedOut : loggedOut, alreadyLoggedOut : alreadyLoggedOut})
 }
 
 //Does NOT work. An attempt at using jQuery.
@@ -472,4 +527,7 @@ CS313 Week 12 Teacher's Solution - test.js
 
 https://www.w3schools.com/tags/att_input_pattern.asp
 W3Schools - HTML <input> pattern Attribute
+
+https://www.w3schools.com/jquery/html_text.asp
+W3Schools - jQuery text() Method [Note about using html() method instead]
  */

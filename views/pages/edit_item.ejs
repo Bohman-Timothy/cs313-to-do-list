@@ -46,13 +46,12 @@
 					document.getElementById("editToDoItemResult").innerHTML = "<p>" + xmlHttp.responseText + "</p> <p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
 				}*/
             }
-			/*else {
-				console.log("xmlHttp.readyState: " + xmlHttp.readyState + " xmlHttp.status: " + xmlHttp.status)
-			}*/
+			if (success === false) {
+				document.getElementById("editToDoItemResult").innerHTML = "<p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
+			}
+
+			console.log("xmlHttp.readyState: " + xmlHttp.readyState + " xmlHttp.status: " + xmlHttp.status)
         }
-		if (success === false) {
-			document.getElementById("editToDoItemResult").innerHTML = "<p class='errorMessage'>Failed to update to-do item &quot;" + taskName + "&quot;</p> <p>Ensure that the to-do item has a task name and that both dates have been entered correctly, according to the format described above.</p>"
-		}
 
         const query = '/editToDoItem?id=' + taskId + '&thing_to_do=' + taskName + '&notes=' + notes + '&date_to_start=' + fromDate + '&date_to_be_done=' + toDate
 

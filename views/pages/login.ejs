@@ -13,23 +13,39 @@
 <label for="password">Enter Password:</label>
 <input type="password" name="password" id="password" required><br/>
 <input type="button" name="login" value="Log In" class="submitButton" onclick="login(username.value, password.value)">
+<input type="button" name="logout" value="Log Out" class="submitButton" onclick="logout()">
 <div id="loginResult">
 </div>
 </body>
 <script>
 function login (username, password) {
+	console.log("Reached local login function")
+
 	var loginDetails = {
 		username: username,
 		password: password
 	}
 
-	$.post("/login", loginDetails function (result) {
-		if (result) {
-			$(#"loginResult").text("<p class='successMessage'>Logged in as " + username + ".</p>")
+	$.post("/login", loginDetails, function (loginResult) {
+		if (loginResult && loginResult.loggedIn) {
+			$("#loginResult").html("<p class='successMessage'>Logged in as " + username + ".</p>")
 		} else {
-			$(#"loginResult").text("<p class='errorMessage'>Error logging in.</p>")
+			$("#loginResult").html("<p class='errorMessage'>Error logging in.</p>")
 		}
-	}
+	})
+}
+
+function logout () {
+	console.log("Reached local logout function")
+	$.post("/logout", function(logoutResult) {
+		if (logoutResult && logoutResult.loggedOut) {
+			$("#loginResult").html("<p class='successMessage'>Successfully logged out.</p>")
+		} else if (logoutResult.alreadyLoggedOut) {
+			$("#loginResult").html("<p class='errorMessage'>Error logging out. No user was logged in.</p>")
+		} else {
+			$("#loginResult").html("<p class='errorMessage'>Error logging out.</p>")
+		}
+	})
 }
 </script>
 </html>
