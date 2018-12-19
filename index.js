@@ -189,7 +189,7 @@ function toDoId (request, response) {
 function addToDoItem (request, response) {
     var errorMessage
     if (typeof(request.session.userId) !== "undefined") {
-        if ((typeof(request.query.thing_to_do) !== "undefined") && (typeof(request.query.date_to_start) !== "undefined") && (typeof(request.query.date_to_be_done) !== "undefined")) {
+        if ((typeof(request.query.thing_to_do) !== "undefined") && (request.query.thing_to_do.length !== 0) && (typeof(request.query.date_to_start) !== "undefined") && (typeof(request.query.date_to_be_done) !== "undefined")) {
             console.log("Thing to do: " + request.query.thing_to_do)
             const insertQuery = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES (1, \'' + request.query.thing_to_do + '\', \'' + request.query.notes + '\', \'' + request.query.date_to_start + '\', \'' + request.query.date_to_be_done + '\')  RETURNING id'
             const qText = 'INSERT INTO to_do_item (user_id_fk, thing_to_do, notes, date_to_start, date_to_be_done) VALUES ($1, $2, $3, $4, $5) RETURNING id, thing_to_do, notes, date_to_start, date_to_be_done'
@@ -268,6 +268,14 @@ function editItemGet (request, response) {
 
 //Get data (POST request) for a single to-do item and prepare that data to be placed within the edit item page's form; then render the /editItem page containing that data
 function editItem (request, response) {
+    /* //Testing basic functionality. It just won't render the page.
+    response.render('pages/edit_item', {
+        id: 2,
+        thing_to_do: 'none',
+        date_to_start: 2018-12-18,
+        date_to_be_done: 2018-12-19,
+        notes: 'notes'
+    })*/
     var errorMessage
     var thing_to_do, date_to_start, date_to_be_done, notes
     const htmlPage = "pages/edit_item"
@@ -426,10 +434,6 @@ function login (req, res) {
     });
 }
 
-function loginForm() {
-
-}
-
 function logout (req, res) {
     var loggedOut = false
     var alreadyLoggedOut = false
@@ -461,7 +465,7 @@ function logout (req, res) {
 $("p").hide()
 })*/
 
-function retrieveToDoItemId (selectedId) {
+/*function retrieveToDoItemId (selectedId) {
     console.log(selectedId)
     pool.query('SELECT id, thing_to_do, notes, date_to_start, date_to_be_done FROM to_do_item WHERE id = ' + selectedId, (err, res) => {
         if (err) {
@@ -472,12 +476,12 @@ function retrieveToDoItemId (selectedId) {
             console.log(JSON.stringify(res.rows))
             return response.json(res.rows)
         }
-    })
+    })*/
     /*const target = "/toDoId?id=" + $("#toDoId").val() //get to-do item ID from form
     console.log(target)*/
-}
+//}
 
-//Retrieves just one item, according to ID given. Does work, but requires bodyParser and/or htmlParser, which are commented out near the beginning of this file. Also needs the form that is commented out on the /list page.
+//Retrieves just one item, according to ID given. Does work, but requires bodyParser and/or htmlParser, which are commented out near the beginning of this file. Also requires retrieveToDoItemId function (above). Also needs the form that is commented out on the /list page.
 /*function toDoList (request, response, next) {
     //res.render('partials/list')
     const selectedId = request.body.toDoId
@@ -515,9 +519,6 @@ function retrieveToDoItemId (selectedId) {
     console.log(target)
     res.redirect(target)*/
 //}
-
-function displayToDoItems () {
-}
 
 
 /*
@@ -595,4 +596,7 @@ W3Schools - jQuery text() Method [Note about using html() method instead]
 
 https://stackoverflow.com/questions/36144081/res-render-not-rendering
 Stack Overflow - Res.render() not rendering
+
+https://stackoverflow.com/questions/6396101/pure-javascript-send-post-data-without-a-form
+Stack Overflow - Pure Javascript send post data without a form
  */

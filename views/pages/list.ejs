@@ -74,7 +74,7 @@
 				else {
 					var fullListHtml = '<ol class="toDoList">'
 					for (var i = 0; i < ids.length; ++i) {
-						fullListHtml += '<li><input type="button" value="Edit" id="editItem" onclick="postToEditItem(' + ids[i]["id"] + ')" id="' + ids[i]["id"] + '"> <input type="button" value="Delete" onclick="deleteToDoItem(' + ids[i]["id"] + ', \'' + ids[i]["thing_to_do"] + '\')" id="' + ids[i]["id"] + '"> <ul class="toDoDetails"> <li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + ' <li><strong>Start Date:</strong> ' + ids[i]["date_to_start"] + '</li> <li><strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '</li> <li><strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul></li>'
+						fullListHtml += '<li><input type="button" value="Edit" onclick="linkToEditItem(' + ids[i]["id"] + ')" id="toDoId' + ids[i]["id"] + '"> <input type="button" value="Delete" onclick="deleteToDoItem(' + ids[i]["id"] + ', \'' + ids[i]["thing_to_do"] + '\')" id="' + ids[i]["id"] + '"> <ul class="toDoDetails"> <li><strong>To Do:</strong> ' + ids[i]["thing_to_do"] + ' <li><strong>Start Date:</strong> ' + ids[i]["date_to_start"] + '</li> <li><strong>End Date:</strong> ' + ids[i]["date_to_be_done"] + '</li> <li><strong>Notes:</strong> ' + ids[i]["notes"] + '</li></ul></li>'
 					}
 					fullListHtml += "</ol>"
 					document.getElementById("toDoListResults").innerHTML = fullListHtml
@@ -96,8 +96,20 @@
 		var params = {
 			toDoId: toDoId
 		}
-		$.post("/editItem", params, function () {})
+
+		$.post("/editItem", params)
 	}
+	/*{
+		/*const xmlHttp = new XMLHttpRequest()
+		xmlHttp.open("POST", "/editItem", true)
+		xmlHttp.setRequestHeader('Content-Type', 'application/json')*/
+		/*xmlHttp.onreadystatechange = function() {
+            console.log("List function reached")
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+			}
+		}*/
+		/*xmlHttp.send(params)
+	}*/
 
 	function deleteToDoItem (toDoId, taskName) {
 		var success = false
